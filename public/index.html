@@ -8,7 +8,8 @@
   <link rel="shortcut icon" href="icons/icon-192x192.png" type="image/x-icon">
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css"> 
+  <!-- add link to manifest file -->
   <link rel="manifest" href="manifest.webmanifest">
 
   <title>Budget Tracker</title>
@@ -44,12 +45,14 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
   <script src="index.js"></script>
+
+  <!-- code to call service worker and check if it's running, report success -->
   <script type="text/javascript">
   if ("serviceWorker" in navigator)
     {
       window.addEventListener("load", () =>
       {
-        navigator.serviceWorker.regist("./service-worker.js").then(reg => 
+        navigator.serviceWorker.register("./service-worker.js").then(reg => 
         {
           console.log("We found your service work file!", reg);
         });
