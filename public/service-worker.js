@@ -1,24 +1,24 @@
 
 console.log("Hello from your service worker!");
 
-const PRECACHE = "precache-v1";
-const RUNTIME = "runtime";
+const PRE_CACHE = "precache-v1";
+const RUNTIME_CACHE = "runtime-cache";
 
 const FILES_TO_CACHE = [
     "/",
-    "/app.js",
+    "/index.html",
     "/index.js",
     "manifest.webmanifest",
-    "styles.css",
-    "icons/icon-192x192.png",
+    "/styles.css",
+    "/db.js",
+    "/icons/icon-192x192.png",
     "/icons/icon-512x512.png"
-
     ];
 
 //install service worker
 self.addEventListener("install", event =>
 {  
-    event.waitUntil(caches.open(PRECACHE)
+    event.waitUntil(caches.open(PRE_CACHE)
             .then(cache => cache.addAll(FILES_TO_CACHE))
             .then(self.skipWaiting()));
 });
@@ -26,51 +26,46 @@ self.addEventListener("install", event =>
 //activate
 self.addEventListener("activate", event => 
 {
-    //const activeCaches = [PRECACHE, RUNTIME];
-
-    evt.waitUntil(
-        caches.keys().then(keyList => 
-            {
-                return Promise.all(keyList.map(key => 
-                    {
-                        if (key !== PRECACHE && key !== RUNTIME) 
-                        {
-                        console.log("Removing old cache data", key);
-                        return caches.delete(key);
-                         }
-                    }));
-            }));
-      self.clients.claim();    
+    const activeCaches = [PRE_CACHE, RUNTIME_CACHE];
+   
+    event.waitUntil(
+      caches
+        .keys()
+        .then(cacheNames => {
+          // return array of cache names that are old to delete
+          return cacheNames.filter(
+            cacheName => !activeCaches.includes(cacheName)
+          );
+        })
+        .then(cachesToDelete => {
+          return Promise.all(
+            cachesToDelete.map(cacheToDelete => {
+              return caches.delete(cacheToDelete);
+            })
+          );
+        })
+        .then(() => self.clients.claim())
+    );
 });
 
 //fetch
-self.addEventListener("fetch", event => 
-{
-    const {url} = evt.request;
-    if (url.includes("/all") || url.includes("/find")) {
-      evt.respondWith(
-        caches.open(RUNTIME).then(cache => {
-          return fetch(evt.request)
-            .then(response => {
-              // If the response was good, clone it and store it in the cache.
-              if (response.status === 200) {
-                cache.put(evt.request, response.clone());
-              }
+self.addEventListener("fetch", event => {
+    if (event.request.url.startsWith(self.location.origin)) 
+    {
+      // use cache first for all other requests for performance
+      event.respondWith(
+        caches.match(event.request).then(cachedResponse => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
   
-              return response;
-            })
-            .catch(err => {
-              // Network request failed, try to get it from the cache.
-              return cache.match(evt.request);
+          // request is not in cache. make network request and cache the response
+          return caches.open(RUNTIME_CACHE).then(cache => {
+            return fetch(event.request).then(response => {
+              return cache.put(event.request, response.clone()).then(() => {
+                return response;
+              });
             });
-        }).catch(err => console.log(err))
-      );
-    } else {
-      // respond from static cache, request is not for /api/*
-      evt.respondWith(
-        caches.open(PRECACHE).then(cache => {
-          return cache.match(evt.request).then(response => {
-            return response || fetch(evt.request);
           });
         })
       );
