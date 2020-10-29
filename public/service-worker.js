@@ -12,14 +12,14 @@ const FILES_TO_CACHE = [
   '/icons/icon-512x512.png'
   ]
 
-const CACHE_NAME = "static-cache-v2";
-const DATA_CACHE_NAME = "data-cache-v1";
+const CACHE_NAME = "staticcache-v2";
+const RUNTIME_CACHE = "datacache-v1";
 
 self.addEventListener('install', function (evt) 
 {
   evt.waitUntil(
       caches.open(CACHE_NAME).then(cache => {
-          console.log("Your files were pre-cached successfully!");
+          console.log("Files successfully pre-cached.");
           return cache.addAll(FILES_TO_CACHE);
       })
   );
@@ -32,7 +32,7 @@ self.addEventListener("activate", function (evt)
       caches.keys().then(keyList => {
           return Promise.all(
               keyList.map(key => {
-                  if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
+                  if (key !== CACHE_NAME && key !== RUNTIME_CACHE) {
                       console.log("Removing old cache data", key);
                       return caches.delete(key);
                   }
@@ -48,7 +48,7 @@ self.addEventListener("fetch", function (evt)
   // cache successful requests to the API              
   if (evt.request.url.includes("/api/") && evt.request.method === "GET") {
       evt.respondWith(
-          caches.open(DATA_CACHE_NAME).then(cache => {
+          caches.open(RUNTIME_CACHE).then(cache => {
               return fetch(evt.request)
                   .then(response => {
                       // If the response was good, clone it and store it in the cache.
