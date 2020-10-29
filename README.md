@@ -1,34 +1,5 @@
 ## budgettracker 
 
-PWA applications need three things - manifest file, server-worker file, and interact with the cache API.
-
-# Unit 18 PWA Homework: Online/Offline Budget Trackers
-
-Add functionality to our existing Budget Tracker application to allow for offline access and functionality.
-
-The user will be able to add expenses and deposits to their budget with or without a connection. When entering transactions offline, they should populate the total when brought back online.
-
-Offline Functionality:
-
-  * Enter deposits offline
-
-  * Enter expenses offline
-
-When brought back online:
-
-  * Offline entries should be added to tracker.
-
-* Deploy your application with [Heroku and MongoDB Atlas.](../04-Important/MongoAtlas-Deploy.md)
-
-## Submission on BCS
-
-* You are required to submit the following:
-
-  * the URL to the deployed application
-
-  * the URL to the Github repository
-
-
 ## Table of Contents:  
 [1. Description](#Description)  
 [2. Installation](#Installation)  
@@ -41,7 +12,7 @@ When brought back online:
 Budget tracker tracks expenses while online and offline using a PWA app
 
 ## Installation:
-No installation. Go to to   use the app. 
+No installation. Go to to https://murmuring-badlands-99773.herokuapp.com/  use the app. 
 
 ## App Usage:
 Add expenses and deposits to the budget with or without a connection. When entering transactions offline, they will populate the total when brought back online.
